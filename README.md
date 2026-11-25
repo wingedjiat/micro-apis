@@ -76,11 +76,43 @@ Birthplace codes follow the community-maintained list on Wikipedia
 
 ---
 
+## Phone number parser & validator (SEA + global)
+
+Validate and format phone numbers for Malaysia, Singapore, Indonesia, Thailand,
+the Philippines, Vietnam — or anywhere. Built on libphonenumber.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/phone/parse?number=&country=` | Parse & validate; returns formats, country, line type. |
+| GET | `/phone/validate?number=&country=` | Validate a number (boolean). |
+
+National-form numbers (e.g. `012-345 6789`) need a `country` (e.g. `MY`);
+international-form numbers (`+60…`) do not.
+
+```
+GET /phone/parse?number=012-345%206789&country=MY
+```
+
+```json
+{
+  "valid": true,
+  "e164": "+60123456789",
+  "national": "012-345 6789",
+  "international": "+60 12-345 6789",
+  "country": "MY",
+  "countryCallingCode": "60",
+  "type": "mobile"
+}
+```
+
+---
+
 ## Run locally
 
 ```
+npm install      # installs libphonenumber-js (used by the phone API)
 npm start        # starts the HTTP server on http://localhost:3000
-npm test         # runs the unit tests (node --test, zero dependencies)
+npm test         # runs the unit tests (node --test)
 ```
 
 ## Deploy
@@ -96,9 +128,11 @@ npm test         # runs the unit tests (node --test, zero dependencies)
 ## Project layout
 
 ```
-src/ic/index.js        core parser & validator (pure functions)
+src/ic/index.js        IC core parser & validator (pure functions)
 src/ic/birthplace.js   birthplace-code table
+src/phone/index.js     phone parser & validator (libphonenumber-js)
 api/parse.js           Vercel serverless handler
-server.js              zero-dependency HTTP server
-test/ic.test.js        unit tests
+server.js              HTTP server (all routes)
+test/                  unit tests (ic + phone)
+openapi.json           IC API spec · openapi-phone.json  phone API spec
 ```

@@ -2,6 +2,7 @@
 // (Render, Fly, Railway, a VM). For Vercel, use the handlers in /api instead.
 import http from "node:http";
 import { parseMalaysianIC, isValidMalaysianIC } from "./src/ic/index.js";
+import { parsePhone, isValidPhone } from "./src/phone/index.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -30,12 +31,28 @@ const server = http.createServer((req, res) => {
     return json(res, 200, { ic, valid: isValidMalaysianIC(ic) });
   }
 
+  if (url.pathname === "/phone/parse") {
+    const number = url.searchParams.get("number");
+    const country = url.searchParams.get("country");
+    if (!number) return json(res, 400, { error: 'Missing required query parameter "number".' });
+    return json(res, 200, parsePhone(number, country));
+  }
+
+  if (url.pathname === "/phone/validate") {
+    const number = url.searchParams.get("number");
+    const country = url.searchParams.get("country");
+    if (!number) return json(res, 400, { error: 'Missing required query parameter "number".' });
+    return json(res, 200, { number, valid: isValidPhone(number, country) });
+  }
+
   if (url.pathname === "/") {
     return json(res, 200, {
       name: "micro-apis",
       endpoints: {
         "GET /ic/parse?ic=YYMMDD-PB-####": "Parse a Malaysian IC into its parts.",
         "GET /ic/validate?ic=YYMMDD-PB-####": "Validate a Malaysian IC (boolean).",
+        "GET /phone/parse?number=&country=": "Parse & validate a phone number (SEA + global).",
+        "GET /phone/validate?number=&country=": "Validate a phone number (boolean).",
         "GET /health": "Liveness check.",
       },
     });

@@ -1,0 +1,97 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Southeast Asia Phone Validator and Formatter",
+    "description": "Validate and format phone numbers for Malaysia, Singapore, Indonesia, Thailand, the Philippines, Vietnam (and any country). Returns E.164, national and international formats, the country, and the line type (mobile / fixed line). Stateless — nothing is stored.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://micro-apis-vert.vercel.app" }
+  ],
+  "paths": {
+    "/phone/parse": {
+      "get": {
+        "operationId": "parsePhone",
+        "summary": "Parse and validate a phone number",
+        "description": "Returns E.164 / national / international formats, country, calling code, line type, and a validity flag.",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "description": "The phone number. National form (e.g. 012-345 6789) needs the country parameter; international form (+60…) does not.",
+            "schema": { "type": "string" },
+            "example": "012-345 6789"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "description": "ISO country code for a national-format number, e.g. MY, SG, ID, TH, PH, VN.",
+            "schema": { "type": "string" },
+            "example": "MY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parsed number.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "valid": true,
+                  "e164": "+60123456789",
+                  "national": "012-345 6789",
+                  "international": "+60 12-345 6789",
+                  "country": "MY",
+                  "countryCallingCode": "60",
+                  "type": "mobile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing the required 'number' parameter.",
+            "content": {
+              "application/json": {
+                "example": { "error": "Missing required query parameter \"number\"." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/phone/validate": {
+      "get": {
+        "operationId": "validatePhone",
+        "summary": "Validate a phone number",
+        "description": "Returns whether the number is valid for its country.",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "+60123456789"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "MY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Validity result.",
+            "content": {
+              "application/json": {
+                "example": { "number": "+60123456789", "valid": true }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
