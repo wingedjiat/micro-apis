@@ -1,0 +1,111 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Malaysian IC Parser and Validator",
+    "description": "Parse and validate a Malaysian IC (NRIC / MyKad) number. Returns date of birth, age, gender, and place of birth. Pure format validation only — no government-database lookup, and no input is stored.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://micro-apis-vert.vercel.app" }
+  ],
+  "paths": {
+    "/ic/parse": {
+      "get": {
+        "operationId": "parseMalaysianIC",
+        "summary": "Parse a Malaysian IC into its parts",
+        "description": "Returns date of birth, age, gender, place of birth, and a validity flag. Dashes/spaces in the IC are optional.",
+        "parameters": [
+          {
+            "name": "ic",
+            "in": "query",
+            "required": true,
+            "description": "The 12-digit Malaysian IC number (format YYMMDD-PB-####).",
+            "schema": { "type": "string" },
+            "example": "900101-10-5677"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parsed IC.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "input": "900101-10-5677",
+                  "normalized": "900101105677",
+                  "valid": true,
+                  "errors": [],
+                  "formatted": "900101-10-5677",
+                  "dateOfBirth": "1990-01-01",
+                  "centuryInferred": true,
+                  "age": 36,
+                  "gender": "male",
+                  "bornInMalaysia": true,
+                  "placeOfBirth": { "code": "10", "type": "state", "name": "Selangor" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing the required 'ic' parameter.",
+            "content": {
+              "application/json": {
+                "example": { "error": "Missing required query parameter \"ic\"." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ic/validate": {
+      "get": {
+        "operationId": "validateMalaysianIC",
+        "summary": "Validate a Malaysian IC",
+        "description": "Returns whether the IC is well-formed (correct format, a real calendar date, and an assigned birthplace code).",
+        "parameters": [
+          {
+            "name": "ic",
+            "in": "query",
+            "required": true,
+            "description": "The 12-digit Malaysian IC number (format YYMMDD-PB-####).",
+            "schema": { "type": "string" },
+            "example": "900101-10-5678"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Validity result.",
+            "content": {
+              "application/json": {
+                "example": { "ic": "900101-10-5678", "valid": true }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing the required 'ic' parameter.",
+            "content": {
+              "application/json": {
+                "example": { "error": "Missing required query parameter \"ic\"." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Liveness check",
+        "responses": {
+          "200": {
+            "description": "Service is up.",
+            "content": {
+              "application/json": {
+                "example": { "status": "ok" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "micro-apis",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Small pure-compute utility APIs. First: Malaysian IC (NRIC) parser & validator.",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

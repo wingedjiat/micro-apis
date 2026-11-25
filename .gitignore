@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+.vercel/
+dist/
+*.log
+.DS_Store
+
+# Internal strategy docs — kept local, never published
+docs/business-plan.md
+marketing/
+
+.vercel
